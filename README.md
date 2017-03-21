@@ -34,8 +34,8 @@ Features that I would like to add:
 
 Other considerations:
 
-I like to eventually build a browser-side Javascript client to create a user facing website for the API. But, this is still a long ways off and I have much to learn
+I would like to eventually build a browser-side Javascript client to provide a user facing website for the API. But, this is still a long ways off and I have much to learn
 
-Currently, all users can POST and DELETE course content. This is not desireable, but limiting these functions to the original creators is problematic as well. The best solution is an edit and approval system where users POST edits for courses and reviews for author approval. Edits would be stored in an inernal resource with limited access. Orphaned content would need special treatment, but this would fix most other possible issues.
+Currently, all users can POST and DELETE course content. This is not desireable, but limiting these functions to the original authors is problematic as well. The best solution is an edit and approval system where users POST edits for courses and reviews for author approval. Edits would be stored in an inernal resource with limited access. Orphaned content would need special treatment, but this would fix most other possible issues.
 
 > Written with [StackEdit](https://stackedit.io/).
