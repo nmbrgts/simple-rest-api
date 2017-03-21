@@ -36,6 +36,21 @@ class User(Model):
         else:
             raise Exception('User with that email or username already exists')
 
+    @classmethod
+    def update_user(cls, id, username, email, password, **kwargs):
+        email = email.lower()
+        try:
+            user = cls.select().where(cls.id == id).get()
+        except cls.DoesNotExist:
+            raise Exception('User id does not exist')
+        else:
+            user.username = username
+            user.email = email
+            user.password = user.set_password(password)
+            user.save()
+            user.password = password  # for return of password to user
+            return user
+
     @staticmethod
     def verify_auth_token(token):
         serializer = Serializer(config.SECRET_KEY)

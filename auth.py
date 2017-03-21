@@ -1,6 +1,6 @@
-from flask import g
-
+from flask import g, jsonify
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth, MultiAuth
+from argon2.exceptions import VerifyMismatchError
 
 import models
 
@@ -18,7 +18,7 @@ def verify_password(email_or_username, password):
         )
         if not user.verify_password(password):
             return False
-    except models.User.DoesNotExist:
+    except (models.User.DoesNotExist, VerifyMismatchError):
         return False
     else:
         g.user = user

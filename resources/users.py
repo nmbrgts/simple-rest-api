@@ -1,10 +1,11 @@
 import json
-from flask import Blueprint, url_for, make_response
+from flask import Blueprint, url_for, make_response, jsonify, g
 from flask_restful import (
     Resource, Api, inputs, reqparse, fields, marshal, marshal_with
 )
 
 import models
+from auth import auth
 
 
 # should contain user information that will be used internally
@@ -13,7 +14,6 @@ internal_user_fields = {
     'username': fields.String,
     'email': fields.String,
     'password': fields.String,
-    'reviews_written': fields.List(fields.String)
 }
 # should contain user information that can be exposed through api
 external_user_fields = {
@@ -69,7 +69,7 @@ class UserList(Resource):
         # returned users should have the following fields:
         #  username
         #  reviews
-        users = [marshal(user, external_user_fields)
+        users = [marshal(add_reviews(user), external_user_fields)
                  for user in models.User.select()]
         return {'users': users}
 
@@ -86,17 +86,14 @@ class UserList(Resource):
                 return make_response(json.dumps({'error': str(e)}), 400)
             else:
                 return marshal(user, external_user_fields), 201
-        return make_response(
-                    json.dumps(
-                        {'error':
-                            'Password and verfication password do not match'}
-                    ),
-                    400)
+        return make_response(json.dumps(
+            {'error': 'Password and verfication password do not match'}
+            ), 400)
 
 
 class User(Resource):
     def __init__(self):
-        self.reqparse = reparse.RequestParser()
+        self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
             'username',
             type=str,
@@ -131,7 +128,22 @@ class User(Resource):
 
     def get(self, id):
         user = models.User.get(models.User.id == id)
-        return marshal(user, external_user_fields), 200
+        return marshal(add_reviews(user), external_user_fields), 200
+
+    @auth.login_required
+    def put(self, id):
+        args = self.reqparse.parse_args()
+        if args['password'] == args['verify_password']:
+            try:
+                user = models.User.update_user(id, **args)
+            except Exception as e:
+                return make_response(json.dumps({'error': str(e)}), 404)
+            else:
+                return (marshal(user, internal_user_fields), 200,
+                        {'location': url_for('resources.users.user', id=id)})
+        return make_response(json.dumps(
+            {'error': 'Password and verfication password do not match'}
+            ), 400)
 
 
 user_api = Blueprint('resources.users', __name__)

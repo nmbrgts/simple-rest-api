@@ -74,8 +74,8 @@ class ReviewList(Resource):
                    for review in query]
         return {'reviews': reviews}
 
-    @marshal_with(review_fields)
     @auth.login_required
+    @marshal_with(review_fields)
     def post(self):
         args = self.reqparse.parse_args()
         review = models.Review.create(
@@ -117,7 +117,6 @@ class Review(Resource):
     def get(self, id):
         return add_user(add_course(review_or_404(id)))
 
-    @marshal_with(review_fields)
     @auth.login_required
     def put(self, id):
         args = self.reqparse.parse_args()
@@ -132,7 +131,7 @@ class Review(Resource):
             ), 403)
         else:
             review.update(**args)
-            return (add_user(add_course(review)), 200,
+            return (marshal(add_user(add_course(review)), review_fields), 200,
                     {'location': url_for('resources.reviews.review', id=id)})
 
     @auth.login_required

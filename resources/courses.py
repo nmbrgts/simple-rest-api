@@ -55,8 +55,8 @@ class CourseList(Resource):
                    for course in models.Course.select()]
         return {'courses': courses}
 
-    @marshal_with(course_fields)
     @auth.login_required
+    @marshal_with(course_fields)
     def post(self):
         args = self.reqparse.parse_args()
         course = models.Course.create(**args)
@@ -88,8 +88,8 @@ class Course(Resource):
     def get(self, id):
         return add_reviews(course_or_404(id))
 
-    @marshal_with(course_fields)
     @auth.login_required
+    @marshal_with(course_fields)
     def put(self, id):
         args = self.reqparse.parse_args()
         query = models.Course.update(**args).where(models.Course.id == id)
