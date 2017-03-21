@@ -5,7 +5,7 @@ This is a small REST API based off of the Flask REST API course project offered 
 ### Design
 The API is designed around a course review website. Users may create an account and use it to add courses to the existing list of courses and post reviews for these courses. The API has three main resources: **users**, **courses** and **reviews** of courses posted by users. Each of these resources has two endpoints **api/v1/[resource]** to access a full list of records and  **api/v1/[resource]/[id]** for accessing individual records.  
 
-All list resources allow users to view a full list of the respective resource through GET method and allow authenticated users to create new entries through POST method. POST methods on the course list and review list are reserved for authenticated users, but allowed on the user resource to provide users with a way to register their account. Individual record resources allow GET, PUT and DELETE methods for viewing, updating and removing entries. PUT and DELETE are reserved for authenticated users and is only allowed on entries that the user created.
+All list resources allow users to view a full list of the respective resource through GET method and allow authenticated users to create new entries through POST method. POST methods on the course list and review list are reserved for authenticated users, but allowed on the user resource to provide users with a way to register their account. Individual record resources allow GET, PUT and DELETE methods for viewing, updating and removing entries. PUT and DELETE are reserved for authenticated users.
 
 Authentication is handled through Basic HTTP Authentication with an option to use a time limited  token. This token can be obtained by a user through GET request at the **api/v1/users/token** and times out after 1 hour. Passwords are hashed for internal use and are only exposed to the user through the creation of their own account or updating their account information. 
 ### Implementation
@@ -21,17 +21,21 @@ Client side authentication is handled through authentication decorator functions
 Existing improvements to the project:  
 
 * The users resource has been expanded to allow for making requests to the individual user enpoint, **api/v1/users/[id]**. This also allows users to update or delete their accounts with POST and DELETE, respectively. 
-* The Review Model has been updated to share a foreign key with the User Model to connect users to the reviews they author. The user and review resources have been updated to reflect this. 
+* The Review Model has been updated to share a foreign key with the User Model to connect users to the reviews they author. The user and review resources have been updated to reflect this. Users may only update thier own reviews.
 *  The user resource provides a list of relative links to reviews written and the review resource provides a single relative link to the author's resource end point.  
 
 Features that I would like to add:  
 
 * Landing page for API to provide instructions and sign up form
-* Category fields for courses
-*  Up/down vote system for reviews
-*  User profile and user "karma"
-*  Course recommendations using Non-negative Matrix Factorization
+* Category and provider fields for courses
+* Up/down vote system for reviews
+* User profile and user "karma"
+* Course recommendations using Non-negative Matrix Factorization
 
-I would also like to eventually build a browser-side Javascript client to create a user facing website for the API. But, this is still a long ways off and I have much to learn
+Other considerations:
+
+I like to eventually build a browser-side Javascript client to create a user facing website for the API. But, this is still a long ways off and I have much to learn
+
+Currently, all users can POST and DELETE course content. This is not desireable, but limiting these functions to the original creators is problematic as well. The best solution is an edit and approval system where users POST edits for courses and reviews for author approval. Edits would be stored in an inernal resource with limited access. Orphaned content would need special treatment, but this would fix most other possible issues.
 
 > Written with [StackEdit](https://stackedit.io/).
