@@ -4,6 +4,8 @@ from auth import auth
 from resources.courses import courses_api
 from resources.reviews import reviews_api
 from resources.users import user_api
+from resources.edits import edits_api
+from resources.comments import comments_api
 
 from flask import Flask, g, jsonify
 from flask_limiter import Limiter
@@ -13,6 +15,8 @@ app = Flask(__name__)
 app.register_blueprint(courses_api)  # add url prefix here
 app.register_blueprint(reviews_api, url_prefix='/api/v1')
 app.register_blueprint(user_api, url_prefix='/api/v1')
+app.register_blueprint(edits_api, url_prefix='/api/v1')
+app.register_blueprint(comments_api, url_prefix='/api/v1')
 
 # simple ip address limit. other options are the user token or user name.
 limiter = Limiter(app,
