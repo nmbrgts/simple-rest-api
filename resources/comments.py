@@ -32,13 +32,10 @@ def validate_parents(**request_args):
         raise Exception('Comments can only have one valid parent.')
 
 
-def validate_put(request_parser, comment, request_args):
-    parser_args = [arg.name for arg in request_parser.args]
-    for arg in parser_args:
-        comment_arg = getattr(comment, arg, None)
-        request_arg = request_args.get(arg, None)
-        if comment_arg != request_arg:
-            raise Exception('Users may only change the "Comment" field.')
+def validate_put(comment, request_args):
+    if comment.parent_comment_id != request_args['parent_comment'] \
+        or comment.review_id != request_args['review']:
+            raise Exception('Users may only updated "comment" field.')
 
 
 def add_children(comment):
@@ -172,7 +169,7 @@ class Comment(Resource):
             ), 403)
         else:
             try:
-                validate_put(self.reqparse, comment, args)
+                validate_put(comment, args)
             except Exception as e:
                 return make_response(json.dumps(
                     {'error': str(e)}
@@ -180,8 +177,9 @@ class Comment(Resource):
             else:
                 comment.comment = args['comment']
                 return (marshal(add_fields(comment), COMMENT_FIELDS), 200,
-                        {'location': url_for('resources.review.review', id=id)})
+                        {'location': url_for('resources.reviews.review', id=id)})
 
+    @auth.login_required
     def delete(self, id):
         try:
             (models.Comment.delete()

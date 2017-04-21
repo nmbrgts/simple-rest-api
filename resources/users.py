@@ -19,8 +19,13 @@ internal_user_fields = {
 external_user_fields = {
     'id': fields.Integer,
     'username': fields.String,
-    'reviews_written': fields.List(fields.String)
+    'reviews_written': fields.List(fields.String),
+    'comments_written': fields.List(fields.String),
 }
+
+
+def add_fields(user):
+    return add_reviews(add_comments(user))
 
 
 def add_reviews(user):
@@ -28,6 +33,12 @@ def add_reviews(user):
     # to a user model
     user.reviews_written = [url_for('resources.reviews.review', id=review.id)
                             for review in user.review_set]
+    return user
+
+
+def add_comments(user):
+    user.comments_written = [url_for('resources.comments.comment', id=comment.id)
+                             for comment in user.comment_set]
     return user
 
 
@@ -69,7 +80,7 @@ class UserList(Resource):
         # returned users should have the following fields:
         #  username
         #  reviews
-        users = [marshal(add_reviews(user), external_user_fields)
+        users = [marshal(add_fields(user), external_user_fields)
                  for user in models.User.select()]
         return {'users': users}
 
@@ -128,7 +139,7 @@ class User(Resource):
 
     def get(self, id):
         user = models.User.get(models.User.id == id)
-        return marshal(add_reviews(user), external_user_fields), 200
+        return marshal(add_fields(user), external_user_fields), 200
 
     @auth.login_required
     def put(self, id):

@@ -23,15 +23,16 @@ Existing improvements to the project:
 * The users resource has been expanded to allow for making requests to the individual user enpoint, **api/v1/users/[id]**. This also allows users to update or delete their accounts with POST and DELETE, respectively.
 * The Review Model has been updated to share a foreign key with the User Model to connect users to the reviews they author. The user and review resources have been updated to reflect this. Users may only update thier own reviews.
 *  The user resource provides a list of relative links to reviews written and the review resource provides a single relative link to the author's resource end point.
-* Added Comment resource that allows users to comment on reviews as well as other comments.
+* Added Comment resource that allows users to comment on reviews as well as other comments. Child comments are reflected in **api/v1/reviews** resource and comments posted by users are reflected in **api/v1/users** resource.
 
 Features that I would like to add:
 
-* Put for reviews is broken
 * Landing page for API to provide instructions and sign up form
 * Category and provider fields for courses
+  * possibly implement as tags
+  * should tags have their own resource? ...maybe this would make keeping track of user defined tags easier and allow for unified tags across courses. this solution seems uneccesarily complex though...
 * Up/down vote system for reviews and comments
-* User profile and user "karma"
+* User profile and user "karma" based on aggregated up/down votes
 * Course recommendations using Non-negative Matrix Factorization
 
 Other considerations:

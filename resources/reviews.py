@@ -16,8 +16,9 @@ review_fields = {
     'for_course': fields.String,
     'rating': fields.Integer,
     'comment': fields.String(default=''),
+    'child_comments': fields.List(fields.String),
     'by_user': fields.String,
-    'created_at': fields.DateTime
+    'created_at': fields.DateTime,
 }
 
 
@@ -30,15 +31,26 @@ def review_or_404(review_id):
         return review
 
 
+def add_fields(review):
+    return add_user(add_course(add_comments(review)))
+
+
+def add_user(review):
+    review.by_user = url_for('resources.users.user',
+                             id=review.created_by.id)
+    return review
+
+
 def add_course(review):
     review.for_course = url_for('resources.courses.course',
                                 id=review.course.id)
     return review
 
 
-def add_user(review):
-    review.by_user = url_for('resources.users.user',
-                             id=review.created_by.id)
+def add_comments(review):
+    review.child_comments = [url_for('resources.comments.comment',
+                                     id=comment.id)
+                             for comment in review.comment_set]
     return review
 
 
@@ -70,7 +82,7 @@ class ReviewList(Resource):
 
     def get(self):
         query = models.Review.select()
-        reviews = [marshal(add_user(add_course(review)), review_fields)
+        reviews = [marshal(add_fields(review), review_fields)
                    for review in query]
         return {'reviews': reviews}
 
@@ -82,7 +94,7 @@ class ReviewList(Resource):
             created_by=g.user,
             **args
         )
-        return (add_user(add_course(review)), 201,
+        return (add_fields(review), 201,
                 {'location':
                  url_for('resources.reviews.review', id=review.id)})
 
@@ -130,7 +142,12 @@ class Review(Resource):
                 {'error': 'That review does not exist or is not editable'}
             ), 403)
         else:
-            review.update(**args)
+            if args['course'] != comment['course']:
+                return make_response(json.dumps(
+                    {'error': 'Course is not an editable field.'}
+                ), 403)
+            review.comment = args['comment']
+            review.rating = args['rating']
             return (marshal(add_user(add_course(review)), review_fields), 200,
                     {'location': url_for('resources.reviews.review', id=id)})
 
