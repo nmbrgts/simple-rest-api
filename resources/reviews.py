@@ -19,6 +19,8 @@ review_fields = {
     'child_comments': fields.List(fields.String),
     'by_user': fields.String,
     'created_at': fields.DateTime,
+    'up_votes': fields.Integer,
+    'down_votes': fields.Integer,
 }
 
 
@@ -32,7 +34,7 @@ def review_or_404(review_id):
 
 
 def add_fields(review):
-    return add_user(add_course(add_comments(review)))
+    return add_user(add_course(add_comments(add_votes(review))))
 
 
 def add_user(review):
@@ -51,6 +53,17 @@ def add_comments(review):
     review.child_comments = [url_for('resources.comments.comment',
                                      id=comment.id)
                              for comment in review.comment_set]
+    return review
+
+
+def add_votes(review):
+    review.up_votes = 0
+    review.down_votes = 0
+    for vote in review.vote_set:
+        if vote.value == '+':
+            review.up_votes += 1
+        elif vote.value == '-':
+            review.down_votes += 1
     return review
 
 

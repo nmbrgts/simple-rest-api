@@ -21,6 +21,7 @@ external_user_fields = {
     'username': fields.String,
     'reviews_written': fields.List(fields.String),
     'comments_written': fields.List(fields.String),
+    'karma': fields.Integer,
 }
 
 
@@ -96,7 +97,7 @@ class UserList(Resource):
             except Exception as e:
                 return make_response(json.dumps({'error': str(e)}), 400)
             else:
-                return marshal(user, external_user_fields), 201
+                return marshal(user, internal_user_fields), 201
         return make_response(json.dumps(
             {'error': 'Password and verfication password do not match'}
             ), 400)

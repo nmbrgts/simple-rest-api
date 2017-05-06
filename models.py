@@ -24,6 +24,7 @@ class User(Model):
     username = CharField(unique=True)
     email = CharField(unique=True)
     password = CharField()
+    karma = IntegerField(default=0)
 
     class Meta:
         database = DATABASE
@@ -96,6 +97,8 @@ class Review(Model):
     rating = IntegerField()
     comment = TextField(default='')
     created_at = DateTimeField(default=datetime.datetime.now)
+    upvotes = IntegerField(default=0)
+    downvotes = IntegerField(default=0)
 
     class Meta:
         database = DATABASE
@@ -144,6 +147,8 @@ class Comment(Model):
     parent_comment = ForeignKeyField('self', related_name='child_comments',
                                      null=True, default=None)
     comment = TextField(default='')
+    upvotes = IntegerField(default=0)
+    downvotes = IntegerField(default=0)
 
     @classmethod
     def get_children(cls, id):
@@ -167,7 +172,88 @@ class Comment(Model):
         database = DATABASE
 
 
+class Tag(Model):
+    tag = CharField(unique=True)
+    alternatives = TextField()
+
+    class Meta:
+        database = DATABASE
+
+
+class TagLink(Model):
+    tag = ForeignKeyField(Tag, related_name='link_set')
+    course = ForeignKeyField(Course, related_name='link_set')
+
+    class Meta:
+        database = DATABASE
+        contraints = [SQL('UNIQUE(tag, course)')]
+
+
+class Vote(Model):
+    user = ForeignKeyField(User, related_name='vote_set')
+    upvote = IntegerField(default=0)
+    downvote = IntegerField(default=0)
+    review = ForeignKeyField(Review, related_name='vote_set',
+                             null=True, default=None)
+    comment = ForeignKeyField(Comment, related_name='vote_set',
+                              null=True, default=None)
+    @staticmethod
+    def verify_vote(review=None, comment=None,
+                    upvote=None, downvote=None):
+        if (review and comment) or (upvote and downvote):
+            raise Exception('You may only upvote or downvote one entry at a time!')
+        if upvote:
+            upvote = 1
+            downvote = 0
+        else:
+            upvote = 0
+            downvote = 1
+        return upvote, downvote
+
+
+    @classmethod
+    def cast_vote(cls, user, comment=None,
+                  review=None, upvote=None, downvote=None):
+        upvote, downvote = cls.verify_vote(comment, review,
+                                           upvote, downvote)
+        try:
+            vote = cls.get(cls.user == user,
+                           cls.review == review,
+                           cls.comment == comment)
+        except cls.DoesNotExist:
+            vote = cls.create(user=user,
+                              review=review,
+                              comment=comment,
+                              upvote=upvote,
+                              downvote=downvote)
+            return vote
+        else:
+            vote.upvote = upvote
+            vote.downvote = downvote
+            vote.save()
+            return vote
+
+    @classmethod
+    def uncast_vote(cls, user, comment=None, review=None):
+        upvote, downvote = cls.verify_vote(comment, review, 1, None)
+        try:
+            (cls.delete().where(cls.user == user,
+                                cls.review == review,
+                                cls.comment == comment)
+                         .execute())
+        except cls.DoesNotExist:
+            raise Exception('Nothing to delete!')
+
+    class Meta:
+        database = DATABASE
+        contraints = [SQL('UNIQUE(user, review, comment)')]
+
+
 def initialize():
     DATABASE.connect()
-    DATABASE.create_tables([User, Course, Review, Edit, Comment], safe=True)
+    DATABASE.create_tables([User, Course,
+                            Review, Edit,
+                            Comment, Tag,
+                            TagLink, Vote],
+                           safe=True)
     DATABASE.close()
