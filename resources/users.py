@@ -15,6 +15,8 @@ internal_user_fields = {
     'email': fields.String,
     'password': fields.String,
 }
+
+
 # should contain user information that can be exposed through api
 external_user_fields = {
     'id': fields.Integer,
@@ -26,20 +28,39 @@ external_user_fields = {
 
 
 def add_fields(user):
-    return add_reviews(add_comments(user))
+    return add_reviews(add_comments(add_karma(user)))
 
 
 def add_reviews(user):
     # should add a list of user reviews
     # to a user model
-    user.reviews_written = [url_for('resources.reviews.review', id=review.id)
+    user.reviews_written = [url_for('resources.reviews.review',
+                                    id=review.id)
                             for review in user.review_set]
     return user
 
 
 def add_comments(user):
-    user.comments_written = [url_for('resources.comments.comment', id=comment.id)
+    user.comments_written = [url_for('resources.comments.comment',
+                                     id=comment.id)
                              for comment in user.comment_set]
+    return user
+
+
+def total_karma(field):
+    karma = 0
+    for entry in field:
+        for vote in entry.vote_set:
+            karma += vote.upvote
+            karma -= vote.downvote
+    return karma
+
+
+def add_karma(user):
+    karma = 0
+    karma += total_karma(user.comment_set)
+    karma += total_karma(user.review_set)
+    user.karma = karma
     return user
 
 
@@ -97,6 +118,7 @@ class UserList(Resource):
             except Exception as e:
                 return make_response(json.dumps({'error': str(e)}), 400)
             else:
+                user.password = args.get('password')
                 return marshal(user, internal_user_fields), 201
         return make_response(json.dumps(
             {'error': 'Password and verfication password do not match'}

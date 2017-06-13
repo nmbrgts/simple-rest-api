@@ -1,23 +1,15 @@
 import datetime
 import json
-from argon2 import PasswordHasher
 from itsdangerous import (
     TimedJSONWebSignatureSerializer as Serializer,
     BadSignature, SignatureExpired
 )
 from peewee import *
 
-import config
-
-DATABASE = SqliteDatabase('courses.sqlite')
-# DATABASE = PostgresqlDatabase(
-#     'restDB',
-#     host='flask-rest-db.cewxu2uwvb5v.us-west-2.rds.amazonaws.com',
-#     port='5432',
-#     user='nmbrgts',
-#     password='mypassword'
-# )
-HASHER = PasswordHasher()
+try:
+    import private_config as config
+except ImportError:
+    import public_config as config
 
 
 class User(Model):
@@ -27,7 +19,7 @@ class User(Model):
     karma = IntegerField(default=0)
 
     class Meta:
-        database = DATABASE
+        database = config.DATABASE
 
     @classmethod
     def create_user(cls, username, email, password, **kwargs):
@@ -72,10 +64,10 @@ class User(Model):
 
     @staticmethod
     def set_password(password):
-        return HASHER.hash(password)
+        return config.HASHER.hash(password)
 
     def verify_password(self, password):
-        return HASHER.verify(self.password, password)
+        return config.HASHER.verify(self.password, password)
 
     def generate_auth_token(self, expires=3600):
         serializer = Serializer(config.SECRET_KEY, expires_in=expires)
@@ -88,7 +80,7 @@ class Course(Model):
     created_at = DateTimeField(default=datetime.datetime.now)
 
     class Meta:
-        database = DATABASE
+        database = config.DATABASE
 
 
 class Review(Model):
@@ -101,7 +93,7 @@ class Review(Model):
     downvotes = IntegerField(default=0)
 
     class Meta:
-        database = DATABASE
+        database = config.DATABASE
 
 
 class Edit(Model):
@@ -136,7 +128,7 @@ class Edit(Model):
             return cls.get(cls.id == edit_id)
 
     class Meta:
-        database = DATABASE
+        database = config.DATABASE
 
 
 class Comment(Model):
@@ -169,7 +161,7 @@ class Comment(Model):
             return children
 
     class Meta:
-        database = DATABASE
+        database = config.DATABASE
 
 
 class Tag(Model):
@@ -177,7 +169,7 @@ class Tag(Model):
     alternatives = TextField()
 
     class Meta:
-        database = DATABASE
+        database = config.DATABASE
 
 
 class TagLink(Model):
@@ -185,14 +177,20 @@ class TagLink(Model):
     course = ForeignKeyField(Course, related_name='link_set')
 
     class Meta:
-        database = DATABASE
+        database = config.DATABASE
         contraints = [SQL('UNIQUE(tag, course)')]
 
 
 class Vote(Model):
     user = ForeignKeyField(User, related_name='vote_set')
-    upvote = IntegerField(default=0)
-    downvote = IntegerField(default=0)
+    upvote = IntegerField(default=0,
+                          constraints=[
+                              Check('upvote = 1 OR upvote = 0')
+                          ])
+    downvote = IntegerField(default=0,
+                            constraints=[
+                                Check('downvote = 1 OR downvote = 0')
+                            ])
     review = ForeignKeyField(Review, related_name='vote_set',
                              null=True, default=None)
     comment = ForeignKeyField(Comment, related_name='vote_set',
@@ -245,15 +243,15 @@ class Vote(Model):
             raise Exception('Nothing to delete!')
 
     class Meta:
-        database = DATABASE
+        database = config.DATABASE
         contraints = [SQL('UNIQUE(user, review, comment)')]
 
 
 def initialize():
-    DATABASE.connect()
-    DATABASE.create_tables([User, Course,
+    config.DATABASE.connect()
+    config.DATABASE.create_tables([User, Course,
                             Review, Edit,
                             Comment, Tag,
                             TagLink, Vote],
                            safe=True)
-    DATABASE.close()
+    config.DATABASE.close()

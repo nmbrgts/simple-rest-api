@@ -1,4 +1,8 @@
-import config
+try:
+    import private_config as config
+except ImportError:
+    import public_config as config
+
 import models
 from auth import auth
 from resources.courses import courses_api
@@ -6,6 +10,7 @@ from resources.reviews import reviews_api
 from resources.users import user_api
 from resources.edits import edits_api
 from resources.comments import comments_api
+from resources.votes import votes_api
 
 from flask import Flask, g, jsonify
 from flask_limiter import Limiter
@@ -17,8 +22,9 @@ app.register_blueprint(reviews_api, url_prefix='/api/v1')
 app.register_blueprint(user_api, url_prefix='/api/v1')
 app.register_blueprint(edits_api, url_prefix='/api/v1')
 app.register_blueprint(comments_api, url_prefix='/api/v1')
+app.register_blueprint(votes_api, url_prefix='/api/v1')
 
-# simple ip address limit. other options are the user token or user name.
+# simple ip address limit. other options are the user token or uscourseser name.
 limiter = Limiter(app,
                   global_limits=[config.DEFAULT_RATE],
                   key_func=get_ipaddr)

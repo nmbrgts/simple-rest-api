@@ -1,6 +1,13 @@
 __pycache__/*
 resources/__pycache__/*
+resources/*.swp
+resources/.*.swp
+resources/*~
+resources/.*~
+resources/.#*
 *.swp
 .*.swp
 *~
 .*~
+.#*
+private_config.py

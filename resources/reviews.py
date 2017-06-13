@@ -57,13 +57,12 @@ def add_comments(review):
 
 
 def add_votes(review):
-    review.up_votes = 0
-    review.down_votes = 0
+    upvotes = downvotes = 0
     for vote in review.vote_set:
-        if vote.value == '+':
-            review.up_votes += 1
-        elif vote.value == '-':
-            review.down_votes += 1
+        upvotes += vote.upvote
+        downvotes += vote.downvote
+    review.up_votes = upvotes
+    review.down_votes = downvotes
     return review
 
 

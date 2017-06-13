@@ -14,7 +14,13 @@ COMMENT_FIELDS = {
     'parent_comment': fields.String(attribute='p_comment_url'),
     'comment': fields.String,
     'children': fields.List(fields.String),
+    'up_votes': fields.Integer,
+    'down_votes': fields.Integer,
 }
+
+
+def add_fields(comment):
+    return add_user(add_parents(add_children(add_votes(comment))))
 
 
 def validate_parents(**request_args):
@@ -65,8 +71,14 @@ def add_user(comment):
     return comment
 
 
-def add_fields(comment):
-    return add_user(add_parents(add_children(comment)))
+def add_votes(comment):
+    upvotes = downvotes = 0
+    for vote in comment.vote_set:
+        upvotes += vote.upvote
+        downvotes += vote.downvote
+    comment.up_votes = upvotes
+    comment.down_votes = downvotes
+    return comment
 
 
 class CommentList(Resource):
