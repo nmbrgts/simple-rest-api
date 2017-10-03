@@ -1,7 +1,7 @@
 Simple REST API
 --
 ### Project Background
-This is a small REST API based off of the Flask REST API course project offered by [teamtreehouse.com](https://teamtreehouse.com/library/flask-rest-api). This is the final course in the Python and Flask track provided by team treehouse and was by far the most interesting for. This calss focused on the fundamentals of devoping a RESTful API such as design and implementation decissions through a code-along project which is the starting point for this project. Working through the projects in this course, I was introducted to: the Flask ecosystem, handling HTTP requests, RESTful design, user authentication methods, rate limiting and RDB management through ORM. This was my first experience with web application design and ORM (not counting SQLAlchemy's core module, which is not truely an ORM). So, there was a considerable amount for me to learn along the way.
+This is a small REST API based off of the Flask REST API course project offered by [teamtreehouse.com](https://teamtreehouse.com/library/flask-rest-api). This is the final course in the Python and Flask track provided by team treehouse and was by far the most interesting for. This calss focused on the fundamentals of devoping a RESTful API such as design and implementation decissions through a code-along project which is the starting point for this project. Working through the projects in this course, I was introducted to: the Flask ecosystem, handling HTTP requests, RESTful design, user authentication methods, rate limiting and RDB management through ORM. This was my first experience with web application design and using an ORM. So, there was a considerable amount for me to learn along the way.
 ### Design
 The API is designed around a course review website. Users may create an account and use it to add courses to the existing list of courses and post reviews for these courses. The API has three main resources: **users**, **courses** and **reviews** of courses posted by users. Each of these resources has two endpoints **api/v1/[resource]** to access a full list of records and  **api/v1/[resource]/[id]** for accessing individual records.
 
@@ -39,5 +39,11 @@ Other considerations:
 I would like to eventually build a browser-side Javascript client to provide a user facing website for the API. But, this is still a long ways off and I have much to learn
 
 There is some room for optimizing queries. There more than a few instances that create n+1 queries when composing request returns. As an example look at how karma is added to each user.. that might be an (n+1)^2 issue. It should be easy to fix, I am just lazy enough to let this sit for now. 
+<<<<<<< HEAD
+=======
+
+Currently, all users can POST and DELETE course content. This is not desireable, but limiting these functions to the original authors is problematic as well. The best solution is an edit and approval system where users POST edits for courses and reviews for author approval. Edits would be stored in an inernal resource with limited access. Orphaned content would need special treatment, but this would fix most other possible issues.
+
+>>>>>>> f9407e6e26ee5c85ee5e1ad44285efe21bb0ca44
 
 Currently, all users can POST and DELETE course content. This is not desireable, but limiting these functions to the original authors is problematic as well. The best solution is an edit and approval system where users POST edits for courses and reviews for author approval. Edits would be stored in an inernal resource with limited access. Orphaned content would need special treatment, but this would fix most other possible issues.

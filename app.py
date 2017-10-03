@@ -12,6 +12,7 @@ from resources.users import user_api
 from resources.edits import edits_api
 from resources.comments import comments_api
 from resources.votes import votes_api
+from resources.tags import tags_api
 
 from flask import Flask, g, jsonify
 from flask_limiter import Limiter
@@ -25,6 +26,7 @@ app.register_blueprint(user_api, url_prefix='/api/v1')
 app.register_blueprint(edits_api, url_prefix='/api/v1')
 app.register_blueprint(comments_api, url_prefix='/api/v1')
 app.register_blueprint(votes_api, url_prefix='/api/v1')
+app.register_blueprint(tags_api, url_prefix='/api/v1')
 CORS(app)
 
 # simple ip address limit. other options are the user token or uscourseser name.
