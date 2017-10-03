@@ -1,8 +1,7 @@
-import public_config as config
-# try:
-#     import private_config as config
-# except ImportError:
-#     import public_config as config
+try:
+    import private_config as config
+except ImportError:
+    import public_config as config
 
 import models
 from auth import auth
@@ -16,7 +15,6 @@ from resources.votes import votes_api
 from flask import Flask, g, jsonify
 from flask_limiter import Limiter
 from flask_limiter.util import get_ipaddr
-from flask_cors import CORS
 
 app = Flask(__name__)
 app.register_blueprint(courses_api)  # add url prefix here
@@ -25,18 +23,17 @@ app.register_blueprint(user_api, url_prefix='/api/v1')
 app.register_blueprint(edits_api, url_prefix='/api/v1')
 app.register_blueprint(comments_api, url_prefix='/api/v1')
 app.register_blueprint(votes_api, url_prefix='/api/v1')
-CORS(app)
 
 # simple ip address limit. other options are the user token or uscourseser name.
-# limiter = Limiter(app,
-#                   global_limits=[config.DEFAULT_RATE],
-#                   key_func=get_ipaddr)
-# # specifiy a limit for a specific blueprint
-# limiter.limit('40/day')(user_api)
-# method_limiter = limiter.limit(config.DEFAULT_RATE, per_method=True,
-#                                methods=['post', 'put', 'delete'])
-# method_limiter(courses_api)
-# method_limiter(reviews_api)
+limiter = Limiter(app,
+                  global_limits=[config.DEFAULT_RATE],
+                  key_func=get_ipaddr)
+# specifiy a limit for a specific blueprint
+limiter.limit('40/day')(user_api)
+method_limiter = limiter.limit(config.DEFAULT_RATE, per_method=True,
+                               methods=['post', 'put', 'delete'])
+method_limiter(courses_api)
+method_limiter(reviews_api)
 # # exempt a blueprint from limits
 # limiter.exempt(courses_api)
 # limiter.exempt(reviews_api)

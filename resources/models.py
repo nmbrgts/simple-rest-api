@@ -6,11 +6,10 @@ from itsdangerous import (
 )
 from peewee import *
 
-import public_config as config
-# try:
-#     import private_config as config
-# except ImportError:
-#     import public_config as config
+try:
+    import private_config as config
+except ImportError:
+    import public_config as config
 
 
 class User(Model):

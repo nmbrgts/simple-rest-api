@@ -13,13 +13,19 @@ course_fields = {
     'id': fields.Integer,
     'title': fields.String,
     'url': fields.String,
-    'reviews': fields.List(fields.String)
+    'reviews': fields.List(fields.String),
+    'tags': fields.List(fields.String),
 }
 
 
 def add_reviews(course):
     course.reviews = [url_for('resources.reviews.review', id=review.id)
                       for review in course.review_set]
+    return course
+
+
+def add_tags(course):
+    course.tags = [link.tag.tag for link in course.link_set]
     return course
 
 
@@ -51,7 +57,7 @@ class CourseList(Resource):
         super().__init__()
 
     def get(self):
-        courses = [marshal(add_reviews(course), course_fields)
+        courses = [marshal(add_tags(add_reviews(course)), course_fields)
                    for course in models.Course.select()]
         return {'courses': courses}
 
@@ -60,7 +66,7 @@ class CourseList(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         course = models.Course.create(**args)
-        return (add_reviews(course), 201, {
+        return (add_tags(add_reviews(course)), 201, {
                 'location': url_for('resources.courses.course', id=course.id)
                 })
 
@@ -83,10 +89,10 @@ class Course(Resource):
         )
         super().__init__()
 
-    # marshals output, works best with single retur
+    # marshals output, works best with single return
     @marshal_with(course_fields)
     def get(self, id):
-        return add_reviews(course_or_404(id))
+        return add_tags(add_reviews(course_or_404(id)))
 
     @auth.login_required
     @marshal_with(course_fields)
@@ -94,7 +100,7 @@ class Course(Resource):
         args = self.reqparse.parse_args()
         query = models.Course.update(**args).where(models.Course.id == id)
         query.execute()
-        return (add_reviews(course_or_404(id)), 200,
+        return (add_tags(add_reviews(course_or_404(id))), 200,
                 {'location': url_for('resources.courses.course', id=id)})
 
     @auth.login_required
