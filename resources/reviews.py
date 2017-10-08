@@ -99,22 +99,32 @@ class ReviewList(Resource):
         return {'reviews': reviews}
 
     @auth.login_required
-    @marshal_with(review_fields)
     def post(self):
         args = self.reqparse.parse_args()
         try:
             review = models.Review.get(
                 models.Review.created_by == g.user,
-                models.Review.course == args['Course']
+                models.Review.course == args['course']
             )
-        except Review.DoesNotExist:
+            return make_response(json.dumps({
+                       'message' : (
+                           'Users may not review a course multiple times. ' +
+                           'Instead, update your existing review!'
+                       ),
+                    }), 403, {
+                        'location' : url_for('resources.reviews.review',
+                                             id=review.id)
+                    })
+        except models.Review.DoesNotExist:
             review = models.Review.create(
                 created_by=g.user,
                 **args
             )
-        return (add_fields(review), 201,
-                {'location':
-                 url_for('resources.reviews.review', id=review.id)})
+            return (marshal(add_fields(review),
+                            review_fields),
+                   201,
+                   {'location': url_for('resources.reviews.review',
+                                        id=review.id)})
 
 
 class Review(Resource):

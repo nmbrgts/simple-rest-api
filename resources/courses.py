@@ -62,6 +62,9 @@ class CourseList(Resource):
                    for course in models.Course.select()]
         return {'courses': courses}
 
+    # i don't like the way this function looks but, couldn't find a cleaner
+    # way to ensure that this function returns an error if the course already
+    # exists... maybe this functionality should be in the orm module?
     @auth.login_required
     def post(self):
         args = self.reqparse.parse_args()
