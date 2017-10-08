@@ -1,4 +1,4 @@
-from flask import jsonify, Blueprint, url_for, abort
+from flask import jsonify, Blueprint, url_for, abort, make_response
 
 from flask_restful import (
     Resource, Api, reqparse, inputs,
@@ -6,6 +6,7 @@ from flask_restful import (
 )
 
 import models
+import json
 
 from auth import auth
 
@@ -62,13 +63,24 @@ class CourseList(Resource):
         return {'courses': courses}
 
     @auth.login_required
-    @marshal_with(course_fields)
     def post(self):
         args = self.reqparse.parse_args()
-        course = models.Course.create(**args)
-        return (add_tags(add_reviews(course)), 201, {
-                'location': url_for('resources.courses.course', id=course.id)
-                })
+        try:
+            course = models.Course.get(models.Course.title == args['title'],
+                                       models.Course.url == args['url'])
+            return make_response(json.dumps({
+                       'error' : 'entry already exists'
+                   }), 403, {
+                       'location': url_for('resources.courses.course',
+                                           id=course.id)
+                   })
+        except Course.DoesNotExist:
+            course = models.Course.create(**args)
+            return (marshal(add_tags(add_reviews(course)),
+                            course_fields),
+                    201,
+                    {'location': url_for('resources.courses.course',
+                                          id=course.id)})
 
 
 class Course(Resource):

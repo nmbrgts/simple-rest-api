@@ -193,6 +193,13 @@ class Comment(Resource):
 
     @auth.login_required
     def delete(self, id):
+        # this is a very inconvenient approach that
+        # could create a lot of orphans...
+        # should just replace name and content with
+        # 'deleted' fields
+        # what is the best way to do this?
+        # 'deleted' user on initialization? hidden from user
+        # api?
         try:
             (models.Comment.delete()
                    .where(models.Comment.id == id,

@@ -102,10 +102,16 @@ class ReviewList(Resource):
     @marshal_with(review_fields)
     def post(self):
         args = self.reqparse.parse_args()
-        review = models.Review.create(
-            created_by=g.user,
-            **args
-        )
+        try:
+            review = models.Review.get(
+                models.Review.created_by == g.user,
+                models.Review.course == args['Course']
+            )
+        except Review.DoesNotExist:
+            review = models.Review.create(
+                created_by=g.user,
+                **args
+            )
         return (add_fields(review), 201,
                 {'location':
                  url_for('resources.reviews.review', id=review.id)})

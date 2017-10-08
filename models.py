@@ -166,8 +166,23 @@ class Comment(Model):
 
 
 class Tag(Model):
-    tag = CharField(unique=True)
-    alternatives = TextField()
+    lower_tag = CharField(unique=True)
+    tag = TextField()
+
+    @classmethod
+    def get_tags(cls):
+        tags = cls.select().execute()
+        return tags
+
+    @classmethod
+    def add_tag(cls, tag_text):
+        try:
+            tag = cls.get(cls.lower_tag == tag_text.lower())
+        except cls.DoesNotExist:
+            tag = cls.create(lower_tag=tag_text.lower(),
+                             tag=tag_text)
+        return tag
+
 
     class Meta:
         database = config.DATABASE
@@ -176,6 +191,23 @@ class Tag(Model):
 class TagLink(Model):
     tag = ForeignKeyField(Tag, related_name='link_set')
     course = ForeignKeyField(Course, related_name='link_set')
+
+    @classmethod
+    def tag_course(cls, tag_text, course_id):
+        tag = Tag.add_tag(tag_text)
+        try:
+            course = Course.get(Course.id == course_id)
+        except Course.DoesNotExist:
+            raise Exception('Invalid course id')
+        try:
+            taglink =  cls.get(
+                (cls.tag == tag) &
+                (cls.course == course)
+            )
+        except cls.DoesNotExist:
+            taglink = cls.create(tag=tag, course=course)
+        finally:
+            return taglink
 
     class Meta:
         database = config.DATABASE
