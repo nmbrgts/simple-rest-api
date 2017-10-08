@@ -36,7 +36,7 @@ class UpVote(Resource):
             (field, id) = re.findall(regex, args['url'])[0]
         except IndexError:
             return make_response(
-                json.dumps({'error': 'invalid url/uri'}),
+                json.dumps({'message': 'invalid url/uri'}),
                 403
             )
         else:
@@ -58,7 +58,7 @@ class UpVote(Resource):
             except (models.Review.DoesNotExist,
                     models.Course.DoesNotExist):
                 return make_response(
-                    json.dumps({'error': 'invalid comment/review'}),
+                    json.dumps({'message': 'invalid comment/review'}),
                     403
                 )
             else:
@@ -85,7 +85,7 @@ class DownVote(Resource):
             (field, id) = re.findall(regex, args['url'])[0]
         except IndexError:
             return make_response(
-                json.dumps({'error': 'invalid url/uri'}),
+                json.dumps({'message': 'invalid url/uri'}),
                 403
             )
         else:
@@ -107,7 +107,7 @@ class DownVote(Resource):
             except (models.Review.DoesNotExist,
                     models.Course.DoesNotExist):
                 return make_response(
-                    json.dumps({'error': 'invalid comment/review'}),
+                    json.dumps({'message': 'invalid comment/review'}),
                     500
                 )
             else:
@@ -125,4 +125,3 @@ api.add_resource(
     '/downvote',
     endpoint='downvote'
 )
-

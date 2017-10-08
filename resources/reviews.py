@@ -167,12 +167,12 @@ class Review(Resource):
             ).get()
         except models.Review.DoesNotExist:
             return make_response(json.dumps(
-                {'error': 'That review does not exist or is not editable'}
+                {'message': 'That review does not exist or is not editable'}
             ), 403)
         else:
             if args['course'] != comment['course']:
                 return make_response(json.dumps(
-                    {'error': 'Course is not an editable field.'}
+                    {'message': 'Course is not an editable field.'}
                 ), 403)
             review.comment = args['comment']
             review.rating = args['rating']
@@ -188,7 +188,7 @@ class Review(Resource):
             ).get()
         except models.Review.DoesNotExist:
             return make_response(json.dumps(
-                {'error': 'That review does not exist or is not editable'}
+                {'message': 'That review does not exist or is not editable'}
             ), 403)
         else:
             review.delete_instance()

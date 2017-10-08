@@ -120,14 +120,14 @@ class CommentList(Resource):
             validate_parents(**args)
         except Exception as e:
             return make_response(json.dumps(
-                {'error': str(e)}
+                {'message': str(e)}
             ), 403)
         else:
             try:
                 comment = models.Comment.create(**args, created_by=g.user)
             except Exception as e:
                 return make_response(json.dumps(
-                    {'error': str(e)}
+                    {'message': str(e)}
                 ), 500)
             else:
                 return marshal(add_fields(comment), COMMENT_FIELDS)
@@ -164,7 +164,7 @@ class Comment(Resource):
             comment = models.Comment.get(models.Comment.id == id)
         except models.Comment.DoesNotExist:
             return make_response(json.dumps(
-                {'error': 'invalid comment id'}
+                {'message': 'invalid comment id'}
             ), 403)
         else:
             return marshal(add_fields(comment), COMMENT_FIELDS)
@@ -177,14 +177,14 @@ class Comment(Resource):
                                          models.Comment.created_by == g.user)
         except models.Comment.DoesNotExist:
             return make_response(json.dumps(
-                {'error': 'invalid comment id'}
+                {'message': 'invalid comment id'}
             ), 403)
         else:
             try:
                 validate_put(comment, args)
             except Exception as e:
                 return make_response(json.dumps(
-                    {'error': str(e)}
+                    {'message': str(e)}
                 ), 403)
             else:
                 comment.comment = args['comment']
@@ -206,7 +206,7 @@ class Comment(Resource):
                           models.Comment.created_by == g.user))
         except models.Comment.DoesNotExist:
             return make_response(json.dumps(
-                {'error': 'comment does not exist'}
+                {'message': 'comment does not exist'}
             ), 403)
         else:
             return '', 204, {'location': url_for('resources.comments.comments')}

@@ -59,25 +59,6 @@ class Tag(Resource):
             tag_text=args['tag'],
             course_id=id,
         )
-        # except Exception as e:
-        #     print(str(e))
-        #     return make_response(
-        #         json.dumps({'error': 'invalid url/uri'}),
-        #         403
-        #     )
-#         try:
-#             tag = models.Tag.get(models.Tag.tag == args['tag'].lower())
-#         except models.DoesNotExist:
-#             tag = models.Tag.create(tag=args['tag'].lower(), alternatives='')
-#             tag.save()
-#         try:
-#             tag_link = models.TagLink.get(
-#                 (models.TagLink.tag == tag) &
-#                 (models.TagLink.course == course)
-#             )
-#         except models.DoesNotExist:
-#             tag_link = models.TagLink.create(tag=tag, course=course)
-#             tag_link.save()
         return ('', 200, {
                     'location':
                         url_for('resources.courses.course',

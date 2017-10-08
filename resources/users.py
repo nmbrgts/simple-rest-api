@@ -116,12 +116,12 @@ class UserList(Resource):
             try:
                 user = models.User.create_user(**args)
             except Exception as e:
-                return make_response(json.dumps({'error': str(e)}), 400)
+                return make_response(json.dumps({'message': str(e)}), 400)
             else:
                 user.password = args.get('password')
                 return marshal(user, internal_user_fields), 201
         return make_response(json.dumps(
-            {'error': 'Password and verfication password do not match'}
+            {'message': 'Password and verfication password do not match'}
             ), 400)
 
 
@@ -171,12 +171,12 @@ class User(Resource):
             try:
                 user = models.User.update_user(id, **args)
             except Exception as e:
-                return make_response(json.dumps({'error': str(e)}), 404)
+                return make_response(json.dumps({'message': str(e)}), 404)
             else:
                 return (marshal(user, internal_user_fields), 200,
                         {'location': url_for('resources.users.user', id=id)})
         return make_response(json.dumps(
-            {'error': 'Password and verfication password do not match'}
+            {'message': 'Password and verfication password do not match'}
             ), 400)
 
 
