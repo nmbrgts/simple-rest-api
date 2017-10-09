@@ -29,40 +29,8 @@ class UpVote(Resource):
 
     @auth.login_required
     def post(self):
-        regex = r'^.*/(\w+)s/(\d+)$'
-        target = {}
         args = self.reqparse.parse_args()
-        try:
-            (field, id) = re.findall(regex, args['url'])[0]
-        except IndexError:
-            return make_response(
-                json.dumps({'message': 'invalid url/uri'}),
-                403
-            )
-        else:
-            try:
-                if field == 'review':
-                    value = models.Review.get(
-                        models.Review.id == id
-                    )
-                else:
-                    value = models.Comment.get(
-                        models.Comment.id == id
-                    )
-                target[field] = value
-                models.Vote.cast_vote(
-                    user=g.user,
-                    upvote=1,
-                    **target
-                )
-            except (models.Review.DoesNotExist,
-                    models.Course.DoesNotExist):
-                return make_response(
-                    json.dumps({'message': 'invalid comment/review'}),
-                    403
-                )
-            else:
-                return make_response('', 200, {'location': 'url here'})
+        return vote(args, 'upvote')
 
 
 class DownVote(Resource):
@@ -78,40 +46,57 @@ class DownVote(Resource):
 
     @auth.login_required
     def post(self):
-        regex = r'^.*/(\w+)s/(\d+)$'
-        target = {}
         args = self.reqparse.parse_args()
+        return vote(args, 'downvote')
+
+
+def vote(args, vote_field):
+    target = {}
+    regex = r'^.*/(\w+)s/(\d+)$'
+    try:
+        (field, id) = re.findall(regex, args['url'])[0]
+    except IndexError:
+        return make_response(
+            json.dumps({'message': 'invalid url/uri'}),
+            403,
+        )
+    else:
         try:
-            (field, id) = re.findall(regex, args['url'])[0]
-        except IndexError:
-            return make_response(
-                json.dumps({'message': 'invalid url/uri'}),
-                403
-            )
-        else:
-            try:
-                if field == 'review':
-                    value = models.Review.get(
-                        models.Review.id == id
-                    )
-                else:
-                    value = models.Comment.get(
-                        models.Comment.id == id
-                    )
-                target[field] = value
-                models.Vote.cast_vote(
-                    user=g.user,
-                    downvote=1,
-                    **target
+            if field == 'review':
+                value = models.Review.get(
+                    models.Review.id == id
                 )
-            except (models.Review.DoesNotExist,
-                    models.Course.DoesNotExist):
-                return make_response(
-                    json.dumps({'message': 'invalid comment/review'}),
-                    500
+            elif field == 'comment':
+                value = models.Comment.get(
+                    models.Comment.id == id
                 )
             else:
-                return make_response('', 200, {'location': 'url here'})
+                return make_response(
+                    json.dumps({'message': 'invalid url/uri'}),
+                    403,
+                )
+            target[field] = value
+            target[vote_field] = 1
+            models.Vote.cast_vote(
+                user=g.user,
+                **target
+            )
+        except (models.Review.DoesNotExist,
+                models.Comment.DoesNotExist):
+            return make_response(
+                json.dumps({'message': 'invalid comment/review'}),
+                500,
+            )
+        else:
+            return make_response(
+                '',
+                200,
+                {'location': url_for('resources' +
+                                        '.' + field +
+                                        's.' + field,
+                                        id=id)}
+            )
+
 
 votes_api = Blueprint('resources.votes', __name__)
 api = Api(votes_api)
