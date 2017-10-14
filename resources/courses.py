@@ -72,12 +72,12 @@ class CourseList(Resource):
             course = models.Course.get(models.Course.title == args['title'],
                                        models.Course.url == args['url'])
             return make_response(json.dumps({
-                       'error' : 'entry already exists'
+                       'message' : 'entry already exists'
                    }), 403, {
                        'location': url_for('resources.courses.course',
                                            id=course.id)
                    })
-        except Course.DoesNotExist:
+        except models.Course.DoesNotExist:
             course = models.Course.create(**args)
             return (marshal(add_tags(add_reviews(course)),
                             course_fields),
