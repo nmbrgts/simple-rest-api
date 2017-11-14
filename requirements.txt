@@ -1,5 +1,5 @@
 flask==0.12
-flask_httauth==3.2.2
+flask_httpauth==3.2.2
 flask_restful==0.3.5
 flask_cours
 peewee==2.8.8
