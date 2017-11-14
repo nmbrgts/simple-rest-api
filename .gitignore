@@ -10,4 +10,4 @@ resources/.#*
 *~
 .*~
 .#*
-private_config.py
+courses.sqlite
