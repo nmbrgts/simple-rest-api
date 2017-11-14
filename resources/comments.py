@@ -9,7 +9,7 @@ from auth import auth
 
 COMMENT_FIELDS = {
     'by': fields.String,
-    'date': fields.DateTime(attribute='created_at'),
+    'date': fields.DateTime(attribute='created_at', dt_format='iso8601'),
     'review': fields.String(attribute='review_url'),
     'parent_comment': fields.String(attribute='p_comment_url'),
     'comment': fields.String,

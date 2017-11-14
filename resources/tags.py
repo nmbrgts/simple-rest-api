@@ -18,17 +18,16 @@ class TagList(Resource):
             help='No tag provided :C',
             location=['form', 'json'],
         )
-        self.reqparse.add_argument(
-            'course',
-            required=True,
-            help='No tag provided :C',
-            location=['form', 'json'],
-        )
         super().__init__()
 
     def get(self):
         tags = models.Tag.select().execute()
         return {'tags': [tag.tag for tag in tags]}
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        tag = models.Tag.add_tag(args['tag'])
+        return {'tag': tag.tag}, 200
 
 
 class Tag(Resource):
@@ -52,7 +51,6 @@ class Tag(Resource):
     def post(self):
         regex = r'^.*/(\w+)s/(\d+)$'
         args = self.reqparse.parse_args()
-        # try:
         _, id = re.findall(regex, args['course'])[0]
         id = int(id)
         course = models.TagLink.tag_course(

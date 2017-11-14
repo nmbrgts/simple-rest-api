@@ -6,11 +6,10 @@ from itsdangerous import (
 )
 from peewee import *
 
-import public_config as config
-# try:
-#     import private_config as config
-# except ImportError:
-#     import public_config as config
+try:
+    import private_config as config
+except ImportError:
+    import public_config as config
 
 
 class User(Model):
@@ -78,7 +77,7 @@ class User(Model):
 class Course(Model):
     title = CharField()
     url = CharField(unique=True)
-    created_at = DateTimeField(default=datetime.datetime.now)
+    created_at = DateTimeField(default=datetime.datetime.utcnow)
 
     class Meta:
         database = config.DATABASE
@@ -89,7 +88,7 @@ class Review(Model):
     created_by = ForeignKeyField(User, related_name='review_set')
     rating = IntegerField()
     comment = TextField(default='')
-    created_at = DateTimeField(default=datetime.datetime.now)
+    created_at = DateTimeField(default=datetime.datetime.utcnow)
     upvotes = IntegerField(default=0)
     downvotes = IntegerField(default=0)
 
@@ -109,7 +108,7 @@ class Edit(Model):
         constraints=[
             Check("status IN ('pending', 'approved', 'denied')")
         ])
-    created_at = DateTimeField(default=datetime.datetime.now)
+    created_at = DateTimeField(default=datetime.datetime.utcnow)
 
     @classmethod
     def update_edit(cls, edit_id, user, **edit_args):
@@ -136,7 +135,7 @@ class Comment(Model):
     review = ForeignKeyField(Review, related_name='comment_set',
                              null=True, default=None)
     created_by = ForeignKeyField(User, related_name='comment_set')
-    created_at = DateTimeField(default=datetime.datetime.now)
+    created_at = DateTimeField(default=datetime.datetime.utcnow)
     parent_comment = ForeignKeyField('self', related_name='child_comments',
                                      null=True, default=None)
     comment = TextField(default='')

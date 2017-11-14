@@ -18,7 +18,7 @@ review_fields = {
     'comment': fields.String(default=''),
     'child_comments': fields.List(fields.String),
     'by_user': fields.String,
-    'created_at': fields.DateTime,
+    'created_at': fields.DateTime(dt_format='iso8601'),
     'up_votes': fields.Integer,
     'down_votes': fields.Integer,
 }

@@ -12,7 +12,7 @@ edit_fields = {
     'edit_for': fields.String,
     'entry': fields.Raw,
     'status': fields.String,
-    'created_at': fields.DateTime,
+    'created_at': fields.DateTime(dt_format='iso8601'),
     'created_by': fields.String(attribute='created_by_url')
 }
 
