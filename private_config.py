@@ -2,9 +2,9 @@
 from argon2 import PasswordHasher
 from peewee import PostgresqlDatabase
 
-DEBUG = False # True
-HOST = None   # '0.0.0.0'
-PORT = None   # 8000
+DEBUG = True
+HOST = '0.0.0.0'
+PORT = 8000
 SECRET_KEY = 'SD:FLKDWUdsfk;aifaw:WEFJuqhw*GF%DR$*&%$eFgYrtUjhuu9IuyR5p^TGIYv'
 DEFAULT_RATE = '100/hour'
 HASHER = PasswordHasher()
