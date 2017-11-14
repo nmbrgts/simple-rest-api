@@ -14,8 +14,8 @@ from resources.votes import votes_api
 from resources.tags import tags_api
 
 from flask import Flask, g, jsonify
-from flask_limiter import Limiter
-from flask_limiter.util import get_ipaddr
+# from flask_limiter import Limiter
+# from flask_limiter.util import get_ipaddr
 from flask_cors import CORS
 
 app = Flask(__name__)
