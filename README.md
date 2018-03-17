@@ -39,11 +39,7 @@ Other considerations:
 I would like to eventually build a browser-side Javascript client to provide a user facing website for the API. But, this is still a long ways off and I have much to learn
 
 There is some room for optimizing queries. There more than a few instances that create n+1 queries when composing request returns. As an example look at how karma is added to each user.. that might be an (n+1)^2 issue. It should be easy to fix, I am just lazy enough to let this sit for now. 
-<<<<<<< HEAD
-=======
 
 Currently, all users can POST and DELETE course content. This is not desireable, but limiting these functions to the original authors is problematic as well. The best solution is an edit and approval system where users POST edits for courses and reviews for author approval. Edits would be stored in an inernal resource with limited access. Orphaned content would need special treatment, but this would fix most other possible issues.
-
->>>>>>> f9407e6e26ee5c85ee5e1ad44285efe21bb0ca44
 
 Currently, all users can POST and DELETE course content. This is not desireable, but limiting these functions to the original authors is problematic as well. The best solution is an edit and approval system where users POST edits for courses and reviews for author approval. Edits would be stored in an inernal resource with limited access. Orphaned content would need special treatment, but this would fix most other possible issues.
