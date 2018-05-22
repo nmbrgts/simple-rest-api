@@ -13,5 +13,7 @@ DATABASE = PostgresqlDatabase(
     host='course-api.chamxx5zi4uv.us-west-2.rds.amazonaws.com',
     port='5432',
     user='tnick',
-    password='password1'
+    password='password1',
+    sslmode='verify-ca',
+    sslrootcert='./config/amazon-rds-ca-cert.pem'
 )
