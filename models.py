@@ -6,11 +6,7 @@ from itsdangerous import (
 )
 from peewee import *
 
-try:
-    import private_config as config
-except ImportError:
-    import public_config as config
-
+import config_vars as config
 
 class User(Model):
     username = CharField(unique=True)

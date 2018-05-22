@@ -1,7 +1,4 @@
-try:
-    import private_config as config
-except ImportError:
-    import public_config as config
+import config_vars as config
 
 import models
 from auth import auth
