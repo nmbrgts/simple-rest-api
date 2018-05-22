@@ -107,13 +107,13 @@ class ReviewList(Resource):
                 models.Review.course == args['course']
             )
             return make_response(json.dumps({
-                       'message' : (
+                       'message': (
                            'Users may not review a course multiple times. ' +
                            'Instead, update your existing review!'
                        ),
                     }), 403, {
-                        'location' : url_for('resources.reviews.review',
-                                             id=review.id)
+                        'location': url_for('resources.reviews.review',
+                                            id=review.id)
                     })
         except models.Review.DoesNotExist:
             review = models.Review.create(
@@ -122,9 +122,9 @@ class ReviewList(Resource):
             )
             return (marshal(add_fields(review),
                             review_fields),
-                   201,
-                   {'location': url_for('resources.reviews.review',
-                                        id=review.id)})
+                    201,
+                    {'location': url_for('resources.reviews.review',
+                                         id=review.id)})
 
 
 class Review(Resource):
@@ -170,13 +170,13 @@ class Review(Resource):
                 {'message': 'That review does not exist or is not editable'}
             ), 403)
         else:
-            if args['course'] != comment['course']:
+            if args['course'] != review['course']:
                 return make_response(json.dumps(
                     {'message': 'Course is not an editable field.'}
                 ), 403)
             review.comment = args['comment']
             review.rating = args['rating']
-            return (marshal(add_fields(review)), review_fields), 200,
+            return (marshal(add_fields(review), review_fields), 200,
                     {'location': url_for('resources.reviews.review', id=id)})
 
     @auth.login_required
