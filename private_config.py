@@ -10,7 +10,7 @@ SECRET_KEY = 'SD:FLKDWUdsfk;aifaw:WEFJuqhw*GF%DR$*&%$eFgYrtUjhuu9IuyR5p^TGIYv'
 DEFAULT_RATE = '100/hour'
 HASHER = PasswordHasher()
 DATABASE = PostgresqlDatabase(
-    os.eviron['database'],
+    os.environ['database'],
     host=os.environ['host'],
     port=os.environ['port'],
     user=os.environ['user'],
