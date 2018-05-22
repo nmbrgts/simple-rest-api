@@ -155,7 +155,7 @@ class Review(Resource):
 
     @marshal_with(review_fields)
     def get(self, id):
-        return add_user(add_course(review_or_404(id)))
+        return add_fields(review_or_404(id))
 
     @auth.login_required
     def put(self, id):
@@ -176,7 +176,7 @@ class Review(Resource):
                 ), 403)
             review.comment = args['comment']
             review.rating = args['rating']
-            return (marshal(add_user(add_course(review)), review_fields), 200,
+            return (marshal(add_fields(review)), review_fields), 200,
                     {'location': url_for('resources.reviews.review', id=id)})
 
     @auth.login_required

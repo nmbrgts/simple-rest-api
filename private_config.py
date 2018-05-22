@@ -9,9 +9,9 @@ SECRET_KEY = 'SD:FLKDWUdsfk;aifaw:WEFJuqhw*GF%DR$*&%$eFgYrtUjhuu9IuyR5p^TGIYv'
 DEFAULT_RATE = '100/hour'
 HASHER = PasswordHasher()
 DATABASE = PostgresqlDatabase(
-    'restdb3',
-    host='restdb3.cewxu2uwvb5v.us-west-2.rds.amazonaws.com',
+    'course_db',
+    host='course-api.chamxx5zi4uv.us-west-2.rds.amazonaws.com',
     port='5432',
-    user='nmbrgts',
-    password='mypassword'
+    user='tnick',
+    password='password1'
 )

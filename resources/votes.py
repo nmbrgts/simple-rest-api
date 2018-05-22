@@ -37,7 +37,7 @@ class DownVote(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
-            'url', #url for downvote target
+            'url',  # url for downvote target
             type=str,
             help='url must be a url target for vote in the form of a string',
             required=True,
